@@ -22,11 +22,7 @@ public class TestReducer {
 		@Override
 		public void setup(Context context) throws IOException, InterruptedException
         {
-			counterTP=0;
-			counterFP=0;
-			counterTN=0;
-			counterFN=0;
-			fpr=0;
+			
         }
 		
 		@Override
@@ -38,6 +34,7 @@ public class TestReducer {
 			counterFN=0;
 			fpr=0;
 			
+			// Parse informations.
 			for (final Text stats : values) {
 				
 				String concat=stats.toString();
@@ -48,6 +45,7 @@ public class TestReducer {
 				counterFN+=Integer.parseInt(splitted[3]);
 			}
 			
+			// Explicit cast
 			double counterFP_double=counterFP;
 			double counterTN_double=counterTN;
 			
@@ -63,6 +61,10 @@ public class TestReducer {
 
 		}
 		
+		/**
+		 * Utility method for print the output.
+		 * @return
+		 */
 		private String concatStringOutput() {
 			return " TP : "+counterTP+ "\t"+ "FP : "+counterFP+"\t"+"TN: "+counterTN+"\t"+"FN: "+counterFN+" \t \t"+"FPR: "+fpr;
 		}

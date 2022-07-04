@@ -12,7 +12,13 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import it.unipi.hadoop.writable.BloomFilter;
 
-public class CostructionMapper {
+/**
+ * This class contains methods dedicated to the mappers of the first stage "Construction BloomFilters".
+ * 
+ * @author Davide
+ *
+ */
+public class ConstructionMapper {
 
 	public static class BloomFilterInsertionMapper extends Mapper<Object, Text, Text, BloomFilter> {
 
@@ -27,7 +33,9 @@ public class CostructionMapper {
 
 		@Override
 		public void setup(Context context) throws IOException, InterruptedException {
-
+			
+			// Reading the values from the context.
+			
 			int n1 = context.getConfiguration().getInt(GlobalConfig.NUMBER_OF_ELEMENT_IN_BLOOM_FILTER_+"1",2000);
 			double p1 = context.getConfiguration().getFloat(GlobalConfig.PROBABILITY_FALSE_POSITIVE_+"1", Float.parseFloat("0.1"));
 			
@@ -78,14 +86,19 @@ public class CostructionMapper {
 				throws IOException, InterruptedException {
 
 			
-			parseInput(value.toString());
+			parseInput(value.toString());	
 			
 			avgRounded = (int) Math.round(avgRating);
 			BloomFilter bloomFilter = bloomFiltersSet.get(avgRounded-1);
 			bloomFilter.addKey(idRating);
 			
 		}
-
+		
+		
+		/**
+		 * Ad Hoc function for managing the raw input.
+		 * @param rawInput
+		 */
 		private void parseInput(String rawInput) {
 			
 			final StringTokenizer itr = new StringTokenizer(rawInput);
@@ -114,7 +127,7 @@ public class CostructionMapper {
 				BloomFilter bloomFilter = (BloomFilter) iterator.next();
 				
 				key.set(vote+"");
-				context.write(key, bloomFilter);
+				context.write(key, bloomFilter); // Emit each rounded ranking value as key and a bloom filter as a value.
 			}
 
 		}

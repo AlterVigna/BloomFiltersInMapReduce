@@ -104,8 +104,8 @@ public class Driver {
 	 	Job job = new Job(conf, "BloomFiltersCostruction");
         
         job.setJarByClass(Driver.class);
-        job.setMapperClass(CostructionMapper.BloomFilterInsertionMapper.class);
-        job.setReducerClass(CostructionReducer.BloomFilterInsertionReducer.class);
+        job.setMapperClass(ConstructionMapper.BloomFilterInsertionMapper.class);
+        job.setReducerClass(ConstructionReducer.BloomFilterInsertionReducer.class);
         
         
         job.setInputFormatClass(NLineInputFormat.class);

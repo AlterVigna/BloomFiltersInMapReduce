@@ -1,5 +1,12 @@
 package it.unipi.hadoop;
 
+
+/**
+ * Class used to save global constants.
+ * 
+ * @author Davide
+ *
+ */
 public class GlobalConfig {
 	
 	public final static String NUMBER_OF_ELEMENT_IN_BLOOM_FILTER_="DEFAULT_NUMBER_OF_ELEMENT_IN_BLOOM_FILTER_";

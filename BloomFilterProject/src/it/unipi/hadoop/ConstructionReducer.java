@@ -11,7 +11,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 import it.unipi.hadoop.serializable.BloomFilterSerializable;
 import it.unipi.hadoop.writable.BloomFilter;
 
-public class CostructionReducer {
+
+/**
+ * This class contains methods dedicated to the reducer of the first stage "Construction BloomFilters".
+ * @author Davide
+ *
+ */
+public class ConstructionReducer {
 
 
 	public static class BloomFilterInsertionReducer extends Reducer<Text, BloomFilter, Text, Text> {
@@ -22,14 +28,14 @@ public class CostructionReducer {
 		private List<Double> listProbElements;
 		
 		private BloomFilter bloomFilter;
-		//private List<BloomFilter> bloomFilters;
-		
+
 		Text outputKey=new Text();
 		Text outputValue=new Text();
 		
 		@Override
 		public void setup(Context context) throws IOException, InterruptedException
         {
+			// Reading the values from the context.
 			
 			int n1 = context.getConfiguration().getInt(GlobalConfig.NUMBER_OF_ELEMENT_IN_BLOOM_FILTER_+"1",2000);
 			double p1 = context.getConfiguration().getFloat(GlobalConfig.PROBABILITY_FALSE_POSITIVE_+"1", Float.parseFloat("0.1"));
@@ -61,6 +67,7 @@ public class CostructionReducer {
 			int n10 = context.getConfiguration().getInt(GlobalConfig.NUMBER_OF_ELEMENT_IN_BLOOM_FILTER_+"10",10100);
 			double p10 = context.getConfiguration().getFloat(GlobalConfig.PROBABILITY_FALSE_POSITIVE_+"10", Float.parseFloat("0.1"));
 			
+			// Save information in to arrayList because in this point you don't know what is the value received as key for the reducer.
 			listNumElements=  new ArrayList<Integer>(Arrays.asList(n1, n2, n3,
 					n4, n5, n6, n7, n8, n9, n10));
 			listProbElements= new ArrayList<Double>(Arrays.asList(p1, p2, p3,
@@ -72,16 +79,12 @@ public class CostructionReducer {
 
 			int filterIndex = Integer.parseInt(key.toString());	// Determining what filter is responsible for this reducer.
 			
-			// Istanziate new empty filter.
+			// Instantiate new empty filter, depending on the index.
 			bloomFilter= new BloomFilter(listNumElements.get(filterIndex-1), listProbElements.get(filterIndex-1));	
 			
 			for (final BloomFilter bf : values) {
 				bloomFilter.or(bf);		// or bit a bit
 			}
-			
-			
-			//BloomFilter2 bf2= new BloomFilter2(bloomFilter.getN(), bloomFilter.getP(), bloomFilter.getM(), bloomFilter.getK(), bloomFilter.getBits());
-			
 			
 			outputValue.set(new BloomFilterSerializable(bloomFilter).serializeBase64BloomFilter());
 			context.write(key, outputValue);
@@ -90,32 +93,6 @@ public class CostructionReducer {
 		
 		@Override
 		protected void cleanup(Context context) throws IOException, InterruptedException {
-
-			// Print number of entries in the filter
-			/*String valoreContatenatoFinale="";
-			for (Iterator<String> iterator = setStringhe.iterator(); iterator.hasNext();) {
-				String string = (String) iterator.next();
-				valoreContatenatoFinale+=string+"\n";
-				break;
-			}
-
-			keyWord.set(current_mapper+"");
-			word.set(valoreContatenatoFinale);
-			
-			// Write the filter to HDFS once all maps are finished
-			context.write(keyWord, word);*/
-			
-			// INVIARE SOLO I BIT MESSI A 1.
-			// SORTA DI REDUCER...(controllato)
-
-			/*for (int i = 0; i < bloomFilter.getBits().size(); i++) {
-				
-				//if (bloomFilter.getBits().get(i)) {
-					numIndiceText.set(i+"");
-					testo.set("aa");
-					context.write(testo, numIndiceText);
-				//}
-			}*/
 
 		}
 		

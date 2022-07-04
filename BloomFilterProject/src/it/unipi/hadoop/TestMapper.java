@@ -33,8 +33,10 @@ public class TestMapper {
 		@Override
 		public void setup(Context context) throws IOException, InterruptedException {
 			
+			// Read from config the content of Bloom Filters set, reloaded from HDFS.
 			String fileContent = context.getConfiguration().get(GlobalConfig.BLOOMFILTER_FILE_CONTENT);
 			
+			// Initialize all the counters to 0.
 			counterListTP=Arrays.asList(0,0,0,0,0,0,0,0,0,0);
 			counterListFP=Arrays.asList(0,0,0,0,0,0,0,0,0,0);
 			counterListTN=Arrays.asList(0,0,0,0,0,0,0,0,0,0);
@@ -68,7 +70,8 @@ public class TestMapper {
 				}
 			}
 			
-// De comment if u want to test a dataset never seen before			
+// 			De-comment if u want to test a dataset never seen before		
+			
 //			for (int i = 0; i < bloomFiltersSet.size(); i++) {
 //				
 //				BloomFilter bf = bloomFiltersSet.get(i);
@@ -85,10 +88,6 @@ public class TestMapper {
 		}
 
 		
-		
-		
-		
-		
 		@Override
 		protected void cleanup(Context context) throws IOException, InterruptedException {
 
@@ -99,12 +98,15 @@ public class TestMapper {
 									 counterListTN.get(i)+"§§"+
 									 counterListFN.get(i);
 				value.set(concatenation);
-				context.write(key, value);
+				context.write(key, value);	// Emit as a key the rounded ranking value and as value a concatenation of counters information.
 			}
 
 		}
 		
-		
+		/**
+		 * Ad Hoc function for managing the raw input.
+		 * @param rawInput
+		 */
 		private void parseInput(String rawInput) {
 			
 			final StringTokenizer itr = new StringTokenizer(rawInput);
@@ -127,7 +129,12 @@ public class TestMapper {
 
 		
 		
-		/* Utility method to load in one shot the entire set of bloomfilters read from HDFS before */
+		/**
+		 * Utility method to load in one shot the entire set of bloomfilters read from HDFS before.
+		 * @param loadedFileContent
+		 * @return
+		 * @throws IOException
+		 */
 		private List<BloomFilter> loadBloomFiltersFromHDFS(String loadedFileContent) throws IOException {
 			
 			String[] rowSplitted = loadedFileContent.split("\\r?\\n|\\r");
@@ -146,33 +153,7 @@ public class TestMapper {
 		    	 bfArray[voteInt-1]= BloomFilterSerializable.deserializeBase64BloomFilter(base64);
 			}
 			
-			/*
-			BloomFilter bfArray[]= new BloomFilter[10];
-			  try {
-				   
-			      File myObj = new File(filterSetPath+"/part-r-00000");
-			      Scanner myReader = new Scanner(myObj);
-			     
-			      while (myReader.hasNextLine()) {
-			    	  String data = myReader.nextLine();
-			    	  String[] splitted = data.split("\t");
-			    	  
-			    	  String vote=splitted[0];
-			    	  int voteInt = Integer.parseInt(vote);
-			    	  
-			    	  String base64= splitted[1];
-			    	  bfArray[voteInt-1]= BloomFilterSerializable.deserializeBase64BloomFilter(base64);
-			    	 
-			      }
-			      myReader.close();
-			    } catch (FileNotFoundException e) {
-			      System.out.println("An error occurred.");
-			      e.printStackTrace();
-			      System.exit(1);
-			    }
-			    */
-			
-			  return Arrays.asList(bfArray);
+			return Arrays.asList(bfArray);
 		}
 		
 		
